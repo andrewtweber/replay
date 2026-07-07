@@ -1,6 +1,6 @@
 # Replay
 
-[![Tests](https://github.com/andrewtweber/replay/actions/workflows/tests.yml/badge.svg)](https://github.com/andrewtweber/replay/actions/workflows/tests.yml)
+[![Backend](https://github.com/andrewtweber/replay/actions/workflows/backend.yml/badge.svg)](https://github.com/andrewtweber/replay/actions/workflows/backend.yml)
 
 Track changes to Laravel Eloquent models as **replayable steps** — then replay them to reproduce any state.
 
