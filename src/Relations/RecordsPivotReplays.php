@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Replay\Relations;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use Replay\Contracts\RecordsReplays;
 use Replay\Replayer;
 
 /**
  * Records attach / detach / pivot update operations as replay steps on the
  * parent model. sync() and toggle() are captured automatically because
  * Laravel implements them in terms of these three operations.
+ *
+ * @template TRelatedModel of Model
+ * @template TDeclaringModel of Model
  */
 trait RecordsPivotReplays
 {
@@ -18,13 +24,11 @@ trait RecordsPivotReplays
     {
         $records = $this->normalizeAttachRecords($id, $attributes);
 
-        $result = parent::attach($id, $attributes, $touch);
+        parent::attach($id, $attributes, $touch);
 
         if ($records !== []) {
             $this->recordPivotReplay('attached', $records);
         }
-
-        return $result;
     }
 
     public function detach($ids = null, $touch = true)
@@ -61,7 +65,13 @@ trait RecordsPivotReplays
             return;
         }
 
-        $this->getParent()->recordReplay($event, $values, $this->getRelationName() ?? $this->getTable());
+        $parent = $this->getParent();
+
+        if ($parent instanceof RecordsReplays) {
+            // getRelationName() is documented @return string, but the underlying
+            // property is nullable; keep the table name as a fallback.
+            $parent->recordReplay($event, $values, $this->getRelationName() ?? $this->getTable()); // @phpstan-ignore nullCoalesce.expr
+        }
     }
 
     /**
