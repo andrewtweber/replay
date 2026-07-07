@@ -1,5 +1,7 @@
 # Replay
 
+[![Tests](https://github.com/andrewtweber/replay/actions/workflows/tests.yml/badge.svg)](https://github.com/andrewtweber/replay/actions/workflows/tests.yml)
+
 Track changes to Laravel Eloquent models as **replayable steps** — then replay them to reproduce any state.
 
 Instead of only auditing what changed, Replay records each create, update, delete, and many-to-many change as a step that can be re-executed. Deleted a model? Replay its history to bring it back exactly as it was. Want the state as of last Tuesday? Replay up to that step.
