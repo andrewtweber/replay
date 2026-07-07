@@ -37,7 +37,8 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "phpstan": "phpstan analyse"
     },
     "config": {
         "sort-packages": true

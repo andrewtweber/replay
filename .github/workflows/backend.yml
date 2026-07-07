@@ -1,0 +1,78 @@
+name: Backend
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build_backend:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      # Share the built dependencies with the inspect and test jobs so the
+      # environment is only built once.
+      - name: Upload vendor
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+          include-hidden-files: true
+          retention-days: 1
+
+  inspect_backend:
+    name: Inspect (PHPStan)
+    needs: build_backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite
+          coverage: none
+
+      - name: Download vendor
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Run PHPStan
+        run: php vendor/bin/phpstan analyse --no-progress
+
+  test_backend:
+    name: Test (PHPUnit)
+    needs: build_backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite
+          coverage: none
+
+      - name: Download vendor
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Run tests
+        run: php vendor/bin/phpunit
