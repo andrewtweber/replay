@@ -15,6 +15,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Morph Key Type
+    |--------------------------------------------------------------------------
+    |
+    | The column type used for the model_id and user_id morph keys. Use "int"
+    | when your models have auto-incrementing (bigint) keys, "uuid" when they
+    | use UUID/ULID keys, or "string" when a single replays table needs to
+    | hold a mix of both. This is read by the package migration, so set it
+    | before migrating (or roll back and re-run after changing it).
+    |
+    | Supported: "int", "uuid", "string"
+    |
+    */
+
+    'morph_key_type' => 'int',
+
+    /*
+    |--------------------------------------------------------------------------
     | Store Old Values
     |--------------------------------------------------------------------------
     |
