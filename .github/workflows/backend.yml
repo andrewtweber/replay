@@ -5,14 +5,13 @@ on:
 
 jobs:
   build_backend:
-    name: Build (PHP ${{ matrix.php }} - ${{ matrix.stability }})
+    name: Build (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         php: ['8.1', '8.2', '8.3', '8.4']
-        stability: [prefer-lowest, prefer-stable]
 
     steps:
       - uses: actions/checkout@v4
@@ -24,14 +23,14 @@ jobs:
           coverage: none
 
       - name: Install Composer dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       # Share each built environment with the matching test job (and, for the
-      # stable 8.4 build, the inspect job) so it is only built once.
+      # 8.4 build, the inspect job) so it is only built once.
       - name: Upload vendor
         uses: actions/upload-artifact@v4
         with:
-          name: vendor-${{ matrix.php }}-${{ matrix.stability }}
+          name: vendor-${{ matrix.php }}
           path: vendor
           include-hidden-files: true
           retention-days: 1
@@ -53,14 +52,14 @@ jobs:
       - name: Download vendor
         uses: actions/download-artifact@v4
         with:
-          name: vendor-8.4-prefer-stable
+          name: vendor-8.4
           path: vendor
 
       - name: Run PHPStan
         run: php vendor/bin/phpstan analyse --no-progress
 
   test_backend:
-    name: Test (PHP ${{ matrix.php }} - ${{ matrix.stability }})
+    name: Test (PHP ${{ matrix.php }})
     needs: build_backend
     runs-on: ubuntu-latest
 
@@ -68,7 +67,6 @@ jobs:
       fail-fast: false
       matrix:
         php: ['8.1', '8.2', '8.3', '8.4']
-        stability: [prefer-lowest, prefer-stable]
 
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +80,7 @@ jobs:
       - name: Download vendor
         uses: actions/download-artifact@v4
         with:
-          name: vendor-${{ matrix.php }}-${{ matrix.stability }}
+          name: vendor-${{ matrix.php }}
           path: vendor
 
       - name: Run tests
